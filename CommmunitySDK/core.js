@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gameManagementService = exports.gameServerService = exports.utilities = exports.headServerService = void 0;
+exports.playerManagementService = exports.gameManagementService = exports.gameServerService = exports.utilities = exports.headServerService = void 0;
 const headServerService = __importStar(require("./functions/headServer"));
 exports.headServerService = headServerService;
 const utilities = __importStar(require("./functions/util"));
@@ -32,3 +32,5 @@ const gameServerService = __importStar(require("./functions/gameServer"));
 exports.gameServerService = gameServerService;
 const gameManagementService = __importStar(require("./functions/gameManagementService"));
 exports.gameManagementService = gameManagementService;
+const playerManagementService = __importStar(require("./functions/playerManagementService"));
+exports.playerManagementService = playerManagementService;
