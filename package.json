@@ -1,9 +1,10 @@
 {
-  "name": "gridlocksdk",
+  "name": "gridlockcommunitysdk",
   "version": "0.2.5",
-  "main": "index.ts",
+  "main": "./CommmunitySDK/core.js",   
+  "types": "./CommmunitySDK/core.d.ts", 
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "",
   "license": "GSOL",

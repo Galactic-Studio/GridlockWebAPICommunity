@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2021",            // The JavaScript version to compile to
+      "module": "CommonJS",          // Compile as CommonJS modules
+      "declaration": true,           // Generate .d.ts declaration files for TypeScript consumers
+      "outDir": "CommmunitySDK",            // Directory to output compiled files
+      "strict": false,                // Enable strict type checking
+      "esModuleInterop": true,       // Ensures compatibility with ES6 modules
+      "moduleResolution": "node",    // Use Node.js module resolution
+      "skipLibCheck": true           // Skip checking .d.ts files for faster builds
+    },
+    "include": ["CommunitySDK_TS/**/*"],  // Adjust to your source code location
+    "exclude": ["node_modules"]
+  }
+  
