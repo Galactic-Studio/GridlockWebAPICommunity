@@ -1,11 +1,22 @@
 import {branches, serverStatus, sizes} from "./types/enums";
-import {childServer,headServer} from "./types/objects";
+import {headServer} from "./types/objects";
 import { EC2Client, RunInstancesCommand, DescribeInstancesCommand, Instance, waitUntilInstanceRunning, CreateKeyPairCommand, DeleteKeyPairCommand} from "@aws-sdk/client-ec2";
 import * as CorePG from "./core";
 import axios, {AxiosResponse} from "axios";
 import crypto from "crypto";
 require('dotenv').config()
 
+/**
+ * Starts a head server service with the specified parameters.
+ *
+ * @param {string} [name=""] - The name of the server. If not provided, a name will be generated.
+ * @param {string} [region="us-east-2"] - The AWS region where the server will be started.
+ * @param {branches} [serverBranch=branches.Dev] - The branch of the server to be used.
+ * @param {sizes} [size=sizes.Medium] - The size of the server instance.
+ * @param {boolean} [allowOther=true] - Whether to allow other connections.
+ * @param {string} [dedicatedGameId=""] - The ID of the dedicated game.
+ * @returns {{ serverInfo: headServer; promise: Promise<headServer> }} An object containing the server information and a promise that resolves to the server information.
+ */
 function startHeadServerService(name:string="",  region:string="us-east-2", serverBranch:branches = branches.Dev, size:sizes = sizes.Medium, allowOther:boolean=true, dedicatedGameId:string=""): { serverInfo: headServer; promise: Promise<headServer> } {
     {
         let serverInfo = <headServer>{}

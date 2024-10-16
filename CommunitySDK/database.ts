@@ -18,6 +18,13 @@ const database = getFirestore();
 const headServers = database.collection("headServers")
 const games = database.collection("games")
 
+/**
+ * An object representing the database service.
+ * 
+ * @property {typeof games} games - The games service.
+ * @property {typeof headServers} headServers - The head servers service.
+ * @property {typeof serverManagement} serverManagementService - The server management service.
+ */
 const databaseService = {
     games: games,
     headServers: headServers,

@@ -3,11 +3,24 @@ import * as objects from "../types/objects";
 import * as enums from "../types/enums";
 
 
+/**
+ * Creates and starts a head server with the specified configuration.
+ *
+ * @param {objects.headServer} headServer - An object containing the configuration for the head server.
+ * @returns A promise that resolves when the head server is successfully started.
+ */
 export const createHeadServer = async (headServer:objects.headServer) => {
     return new Promise(async (resolve, reject) => {
         resolve(await databaseService.serverManagementService.startHeadServerService(headServer.name, headServer.region, enums.branches[headServer.branch], enums.sizes[headServer.size], headServer.allowOther))
     })
 }
+
+/**
+ * Registers a head server in the database.
+ *
+ * @param {objects.headServer} headServerData - The data of the head server to be registered.
+ * @returns A promise that resolves when the head server data has been successfully set in the database.
+ */
 export const registerHeadServer = async(headServerData:objects.headServer)=>{
     return new Promise<void>(async (resolve)=>{
         const ref = databaseService.headServers.doc(headServerData.serverId)
@@ -16,6 +29,12 @@ export const registerHeadServer = async(headServerData:objects.headServer)=>{
     })
 }
 
+/**
+ * Stops the head server by updating its status to 'Quiting' and sending a shutdown command.
+ *
+ * @param {string} serverId - The unique identifier of the head server to be stopped.
+ * @returns A promise that resolves when the server has been successfully stopped.
+ */
 export const stopHeadServer = async(serverId:string)=>{
     return new Promise<void>(async (resolve)=>{
         const ref = databaseService.headServers.doc(serverId)
@@ -27,6 +46,18 @@ export const stopHeadServer = async(serverId:string)=>{
     })
 }
 
+/**
+ * Registers and deletes a head server from the database.
+ * 
+ * @param {string} serverId - The unique identifier of the server to be deleted.
+ * @returns A promise that resolves when the server has been successfully deleted.
+ * 
+ * @remarks
+ * This function retrieves the server data from the database using the provided serverId,
+ * deletes the server entry, and then resolves the promise.
+ * 
+ * @todo Update this function for update usages.
+ */
 export const registerDeleteHeadServer = async (serverId:string)=>{ //TODO: update this function for update usages
     return new Promise<void>(async (resolve)=>{
         const ref = databaseService.headServers.doc(serverId)
