@@ -1,4 +1,4 @@
-# **Galactic Studio Open License v0.2.5 (GSOL)**  
+# **Galactic Studio Open License v0.2.9 (GSOL)**  
 Copyright © 2024, Galactic Studio. All rights reserved.
 
 This license applies to the **Project Gridlock Multiplayer Suite Open Source Web API**, developed by Galactic Studio. While this software is provided under an open-source framework, this license enforces specific conditions to ensure fair use, protect intellectual property, and prevent unauthorized partnerships or misuse.
