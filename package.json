@@ -1,6 +1,6 @@
 {
   "name": "gridlockcommunitysdk",
-  "version": "0.2.6",
+  "version": "0.2.8",
   "main": "./CommmunitySDK/core.js",   
   "types": "./CommmunitySDK/core.d.ts", 
   "scripts": {
@@ -17,7 +17,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.21.0",
     "firebase-admin": "^12.0.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "cors":"^2.8.5"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
