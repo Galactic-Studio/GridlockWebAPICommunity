@@ -1,6 +1,6 @@
 {
   "name": "gridlockcommunitysdk",
-  "version": "0.2.9",
+  "version": "0.2.13",
   "main": "./CommmunitySDK/core.js",   
   "types": "./CommmunitySDK/core.d.ts", 
   "scripts": {

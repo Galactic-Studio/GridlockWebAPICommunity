@@ -134,7 +134,7 @@ function startHeadServerService(name = "", region = "us-east-2", serverBranch = 
                         "eval \"$(ssh-agent -s)\"\n" +
                         "ssh-add /root/.ssh/id_ed25519\n" +
                         "\n" +
-                        `git clone -b ${serverInfo.branch} ${process.env.HeadServerGit} /var/www/server \n` +
+                        `git clone -b ${serverInfo.branch} ${process.env.GITHUB_HEAD_GIT} /var/www/server \n` +
                         "cd /var/www/server\n" +
                         "\n" +
                         `echo "${serverInfo.authCode}" > /var/www/server/.auth\n` +
@@ -171,7 +171,7 @@ function startHeadServerService(name = "", region = "us-east-2", serverBranch = 
                 else {
                     reject("Instance details not found in DescribeInstances response.");
                 }
-                serverInfo.address = serverInfo.ip + ":" + process.env.HeadServerPort;
+                serverInfo.address = serverInfo.ip + ":" + process.env.DEFAULT_HEADSERVER_PORT;
                 serverInfo.status = enums_1.serverStatus.Ready;
                 await CorePG.headServerService.createHeadServer(serverInfo);
                 resolve(serverInfo);

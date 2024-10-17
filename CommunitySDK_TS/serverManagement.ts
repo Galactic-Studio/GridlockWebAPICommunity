@@ -1,6 +1,6 @@
 import {branches, serverStatus, sizes} from "./types/enums";
 import {headServer} from "./types/objects";
-import { EC2Client, RunInstancesCommand, DescribeInstancesCommand, Instance, waitUntilInstanceRunning, CreateKeyPairCommand, DeleteKeyPairCommand} from "@aws-sdk/client-ec2";
+import { EC2Client, RunInstancesCommand, DescribeInstancesCommand, Instance, waitUntilInstanceRunning, CreateKeyPairCommand, DeleteKeyPairCommand, _InstanceType} from "@aws-sdk/client-ec2";
 import * as CorePG from "./core";
 import axios, {AxiosResponse} from "axios";
 import crypto from "crypto";
@@ -54,73 +54,124 @@ function startHeadServerService(name:string="",  region:string="us-east-2", serv
                 } catch (err) {
                     console.error(err);
                 }
-                const command = new RunInstancesCommand({
-                    // Your key pair name.
-                    TagSpecifications: [
-                        {
-                            ResourceType: "instance",
-                            Tags: [
-                                {
-                                    Key: "Name",
-                                    Value: serverInfo.name, // The name of the server
-                                },
-                                {
-                                    Key: "URL",
-                                    Value: serverInfo.serverId + ".galacticstudio.space", // The name of the server
-                                },
-                            ],
-                        },
-                    ],
-
-                    KeyName: serverInfo.serverId.slice(0, 255),
-                    // Your security group.
-                    SecurityGroupIds: ["sg-02a45b5fed3db3b6b"],
-                    // An x86_64 compatible image.
-                    ImageId: "ami-049d60e41ec849de4", //TODO: update image id to our custom image
-                    // An x86_64 compatible free-tier instance type.
-                    InstanceType: "t2.micro", //TODO: update workflow to dynamically decide instance type depending on current workload
-                    UserData: Buffer.from("#!/bin/bash\n" +
-                        "\n" +
-                        "# Logging for debugging\n" +
-                        "exec > /root/serverStart.out 2>&1\n" +
-                        "echo \"Starting user_data script execution\"\n" +
-                        "\n" +
-                        "# Define the SSH private key\n" +
-                        `SSH_KEY="${process.env.GITHUB_HEAD_SERVER_KEY}"` +
-                        "\n" +
-                        "# Save the SSH private key to a file\n" +
-                        "echo \"$SSH_KEY\" > /root/.ssh/id_ed25519\n" +
-                        "chmod 600 /root/.ssh/id_ed25519\n" +
-                        "ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts\n"+
-                        "sudo cat >~/.ssh/config <<EOL\n" +
-                        "\n" +
-                        "Host GVServer\n" +
-                        "Hostname github.com\n" +
-                        "User git\n" +
-                        "IdentityFile ~/.ssh/id_ed25519\n" +
-                        "\n" +
-                        "EOL\n"+
-                        "\n" +
-                        "echo \"SSH key saved\"\n" +
-                        "\n" +
-                        "# Start ssh-agent and add the key\n" +
-                        "eval \"$(ssh-agent -s)\"\n" +
-                        "ssh-add /root/.ssh/id_ed25519\n" +
-                        "\n" +
-                        `git clone -b ${serverInfo.branch} ${process.env.HeadServerGit} /var/www/server \n`+
-                        "cd /var/www/server\n" +
-                        "\n" +
-                        `echo "${serverInfo.authCode}" > /var/www/server/.auth\n`+
-                        `echo "${serverInfo.serverId}" > /var/www/server/.server\n`+
-                        "\n" +
-
-                        "chmod +x startup.sh\n" +
-                        "\n" +
-                        "bash startup.sh\n",).toString("base64"),
-                    // Ensure only 1 instance launches.
-                    MinCount: 1,
-                    MaxCount: 1,
-                })
+                let command:RunInstancesCommand
+                if (process.env.IS_PRIAVTE_GITHUB === "1"){
+                    command = new RunInstancesCommand({
+                        // Your key pair name.
+                        TagSpecifications: [
+                            {
+                                ResourceType: "instance",
+                                Tags: [
+                                    {
+                                        Key: "Name",
+                                        Value: serverInfo.name, // The name of the server
+                                    },
+                                    {
+                                        Key: "URL",
+                                        Value: serverInfo.serverId + ".galacticstudio.space", // The name of the server
+                                    },
+                                ],
+                            },
+                        ],
+    
+                        KeyName: serverInfo.serverId.slice(0, 255),
+                        // Your security group.
+                        SecurityGroupIds: ["sg-02a45b5fed3db3b6b"],
+                        // An x86_64 compatible image.
+                        ImageId: "ami-049d60e41ec849de4", //TODO: update image id to our custom image
+                        // An x86_64 compatible free-tier instance type.
+                        InstanceType: "t2.micro", //TODO: update workflow to dynamically decide instance type depending on current workload
+                        UserData: Buffer.from("#!/bin/bash\n" +
+                            "\n" +
+                            "# Logging for debugging\n" +
+                            "exec > /root/serverStart.out 2>&1\n" +
+                            "echo \"Starting user_data script execution\"\n" +
+                            "\n" +
+                            "# Define the SSH private key\n" +
+                            `SSH_KEY="${process.env.GITHUB_HEAD_SERVER_KEY}"` +
+                            "\n" +
+                            "# Save the SSH private key to a file\n" +
+                            "echo \"$SSH_KEY\" > /root/.ssh/id_ed25519\n" +
+                            "chmod 600 /root/.ssh/id_ed25519\n" +
+                            "ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts\n"+
+                            "sudo cat >~/.ssh/config <<EOL\n" +
+                            "\n" +
+                            "Host GVServer\n" +
+                            "Hostname github.com\n" +
+                            "User git\n" +
+                            "IdentityFile ~/.ssh/id_ed25519\n" +
+                            "\n" +
+                            "EOL\n"+
+                            "\n" +
+                            "echo \"SSH key saved\"\n" +
+                            "\n" +
+                            "# Start ssh-agent and add the key\n" +
+                            "eval \"$(ssh-agent -s)\"\n" +
+                            "ssh-add /root/.ssh/id_ed25519\n" +
+                            "\n" +
+                            `git clone -b ${serverInfo.branch} ${process.env.GITHUB_HEAD_GIT} /var/www/server \n`+
+                            "cd /var/www/server\n" +
+                            "\n" +
+                            `echo "${serverInfo.authCode}" > /var/www/server/.auth\n`+
+                            `echo "${serverInfo.serverId}" > /var/www/server/.server\n`+
+                            "\n" +
+    
+                            "chmod +x startup.sh\n" +
+                            "\n" +
+                            "bash startup.sh\n",).toString("base64"),
+                        // Ensure only 1 instance launches.
+                        MinCount: 1,
+                        MaxCount: 1,
+                    })
+                }else{
+                    command = new RunInstancesCommand({
+                        // Your key pair name.
+                        TagSpecifications: [
+                            {
+                                ResourceType: "instance",
+                                Tags: [
+                                    {
+                                        Key: "Name",
+                                        Value: serverInfo.name, // The name of the server
+                                    },
+                                    {
+                                        Key: "ServerId",
+                                        Value: serverInfo.serverId, // The id of the server
+                                    },
+                                ],
+                            },
+                        ],
+    
+                        KeyName: serverInfo.serverId.slice(0, 255),
+                        // Your security group.
+                        SecurityGroupIds: [process.env.SECURITY_GROUP],
+                        ImageId: process.env.AMI,
+                        // An x86_64 compatible free-tier instance type.
+                        InstanceType: _InstanceType[size], //TODO: update workflow to dynamically decide instance type depending on current workload
+                        UserData: Buffer.from("#!/bin/bash\n" +
+                            "\n" +
+                            "# Logging for debugging\n" +
+                            "exec > /root/serverStart.out 2>&1\n" +
+                            "echo \"Starting user_data script execution\"\n" +
+                            "Host GVServer\n" +
+                            "Hostname github.com\n" +
+                            "User git\n" +
+                            `git clone -b ${serverInfo.branch} ${process.env.GITHUB_HEAD_GIT} /var/www/server \n`+
+                            "cd /var/www/server\n" +
+                            "\n" +
+                            `echo "${serverInfo.authCode}" > /var/www/server/.auth\n`+
+                            `echo "${serverInfo.serverId}" > /var/www/server/.server\n`+
+                            "\n" +
+    
+                            "chmod +x startup.sh\n" +
+                            "\n" +
+                            "bash startup.sh\n",).toString("base64"),
+                        // Ensure only 1 instance launches.
+                        MinCount: 1,
+                        MaxCount: 1,
+                    })
+                }
+                 
                 const runResponse = await ec2Client.send(command)
                 const instanceId = runResponse.Instances?.[0].InstanceId;
                 if (!instanceId) {
@@ -149,7 +200,7 @@ function startHeadServerService(name:string="",  region:string="us-east-2", serv
                 } else {
                     reject("Instance details not found in DescribeInstances response.");
                 }
-                serverInfo.address = serverInfo.ip + ":" + process.env.HeadServerPort
+                serverInfo.address = serverInfo.ip + ":" + process.env.DEFAULT_HEADSERVER_PORT
                 serverInfo.status = serverStatus.Ready
                 await CorePG.headServerService.createHeadServer(serverInfo)
                 resolve(serverInfo)
